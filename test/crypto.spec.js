@@ -46,4 +46,20 @@ describe('nxtCrypto', () => {
       expect(secretPhrase).to.have.lengthOf(128)
     })
   })
+
+  describe('#sha256()', () => {
+    const { sha256 } = nxtCrypto
+
+    it('should be a function', () => {
+      expect(sha256).to.be.a('function')
+    })
+
+    it('should generate a hash of length 64', () => {
+      expect(sha256('test')).to.have.lengthOf(64)
+    })
+
+    it('should generate a correct hash', () => {
+      expect(sha256('test')).to.equal('9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
+    })
+  })
 })
