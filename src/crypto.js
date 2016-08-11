@@ -6,6 +6,7 @@ nacl.util = util
 
 import { converters } from 'nxt-utils'
 import curve25519 from './curve25519'
+import nxtAddress from './nxtAddress'
 
 export const byteArrayToHashByteArray = (byteArray) => {
   const hashBytes = crypto.createHash('sha256')
@@ -98,6 +99,13 @@ export const getAccountId = (publicKey) => {
   return accountId
 }
 
+export const getAccountRS = (publicKey, prefix = 'NXT') => {
+  const accountId = getAccountId(publicKey)
+  const accountRS = new nxtAddress()
+  accountRS.set(accountId)
+  return accountRS.toString()
+}
+
 export const generateSecretPhrase = () => {
   const bytes = nacl.randomBytes(128)
   return crypto.createHash('sha512').update(bytes).digest('hex')
@@ -172,6 +180,7 @@ export default {
   parseToken,
   getPublicKey,
   getAccountId,
+  getAccountRS,
   generateSecretPhrase,
   encrypt,
   decrypt,
