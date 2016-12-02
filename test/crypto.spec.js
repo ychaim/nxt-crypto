@@ -34,6 +34,19 @@ describe('nxtCrypto', () => {
     })
   })
 
+  describe('#getAccountRS', () => {
+    const { getAccountRS } = nxtCrypto
+    const publicKey = 'd9d5c57971eefb085e3abaf7a5a4a6cdb8185f30105583cdb09ad8f61886ec65'
+
+    it('should be a function', () => {
+      expect(getAccountRS).to.be.a('function')
+    })
+
+    it('should return the correct account reed solomon', () => {
+      expect(getAccountRS(publicKey)).to.equal('NXT-E8JD-FHKJ-CQ9H-5KGMQ')
+    })
+  })
+
   describe('#generateSecretPhrase()', () => {
     const { generateSecretPhrase } = nxtCrypto
     const secretPhrase = generateSecretPhrase()
