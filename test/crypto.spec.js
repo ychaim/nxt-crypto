@@ -45,6 +45,10 @@ describe('nxtCrypto', () => {
     it('should return the correct account reed solomon', () => {
       expect(getAccountRS(publicKey)).to.equal('NXT-E8JD-FHKJ-CQ9H-5KGMQ')
     })
+
+    it('should return the correct account reed solomon with a different prefix', () => {
+      expect(getAccountRS(publicKey, 'DBN')).to.equal('DBN-E8JD-FHKJ-CQ9H-5KGMQ')
+    })
   })
 
   describe('#getAccountRSFromSecretPhrase', () => {
