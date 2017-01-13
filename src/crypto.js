@@ -4,7 +4,14 @@ import nacl from 'tweetnacl'
 import util from 'tweetnacl-util'
 nacl.util = util
 
-import { converters } from 'nxt-utils'
+import {
+  byteArrayToIntVal,
+  byteArrayToHexString,
+  byteArrayToBigInteger,
+  stringToByteArray,
+  hexStringToByteArray,
+  stringToHexString
+} from './converters'
 import curve25519 from './curve25519'
 import nxtAddress from './nxtAddress'
 
@@ -12,7 +19,7 @@ export const byteArrayToHashByteArray = (byteArray) => {
   const hashBytes = crypto.createHash('sha256')
     .update(new Buffer(byteArray))
     .digest('hex')
-  return converters.hexStringToByteArray(hashBytes)
+  return hexStringToByteArray(hashBytes)
 }
 
 export const areByteArraysEqual = (bytes1, bytes2) => {
@@ -38,22 +45,22 @@ export const verifyBytes = (signature, message, publicKey) => {
   let y = curve25519.verify(v, h, publicKeyBytes)
   let m = crypto.createHash('sha256').update(new Buffer(messageBytes)).digest('hex')
   let h2 = crypto.createHash('sha256')
-    .update(new Buffer(converters.hexStringToByteArray(m)))
+    .update(new Buffer(hexStringToByteArray(m)))
     .update(new Buffer(y))
     .digest('hex')
 
-  return areByteArraysEqual(h, converters.hexStringToByteArray(h2))
+  return areByteArraysEqual(h, hexStringToByteArray(h2))
 }
 
 export const parseToken = (tokenString, website) => {
-  let websiteBytes = converters.stringToByteArray(website)
+  let websiteBytes = stringToByteArray(website)
   let tokenBytes = []
   let i = 0
   let j = 0
 
   for (; i < tokenString.length; i += 8, j += 5) {
     let number = BigInteger(tokenString.substring(i, i + 8), 32)
-    let part = converters.hexStringToByteArray(number.toString(16))
+    let part = hexStringToByteArray(number.toString(16))
     tokenBytes[j] = part[4]
     tokenBytes[j + 1] = part[3]
     tokenBytes[j + 2] = part[2]
@@ -68,12 +75,12 @@ export const parseToken = (tokenString, website) => {
   let publicKey = tokenBytes.slice(0, 32)
   let timebytes = [tokenBytes[32], tokenBytes[33], tokenBytes[34], tokenBytes[35]]
 
-  let timestamp = converters.byteArrayToIntVal(timebytes)
+  let timestamp = byteArrayToIntVal(timebytes)
   let signature = tokenBytes.slice(36, 100)
   let data = websiteBytes.concat(tokenBytes.slice(0, 36))
 
   let isValid = verifyBytes(signature, data, publicKey)
-  publicKey = converters.byteArrayToHexString(publicKey)
+  publicKey = byteArrayToHexString(publicKey)
 
   return {
     isValid,
@@ -83,18 +90,18 @@ export const parseToken = (tokenString, website) => {
 }
 
 export const getPublicKey = (secretPhrase) => {
-  const secretPhraseBytes = converters.stringToByteArray(secretPhrase)
+  const secretPhraseBytes = stringToByteArray(secretPhrase)
   const hashBytes = byteArrayToHashByteArray(secretPhraseBytes)
 
-  return converters.byteArrayToHexString(curve25519.keygen(hashBytes).p);
+  return byteArrayToHexString(curve25519.keygen(hashBytes).p);
 }
 
 export const getAccountId = (publicKey) => {
-  const publicKeyBytes = converters.hexStringToByteArray(publicKey)
+  const publicKeyBytes = hexStringToByteArray(publicKey)
   const hashBytes = byteArrayToHashByteArray(publicKeyBytes)
-  const account = converters.byteArrayToHexString(hashBytes)
-  const accountSlice = converters.hexStringToByteArray(account).slice(0, 8)
-  const accountId = converters.byteArrayToBigInteger(accountSlice).toString()
+  const account = byteArrayToHexString(hashBytes)
+  const accountSlice = hexStringToByteArray(account).slice(0, 8)
+  const accountId = byteArrayToBigInteger(accountSlice).toString()
 
   return accountId
 }
