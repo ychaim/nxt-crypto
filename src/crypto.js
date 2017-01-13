@@ -36,7 +36,7 @@ export const areByteArraysEqual = (bytes1, bytes2) => {
   return true
 }
 
-export const verifyBytes = (signature, message, publicKey) => {
+const verifyBytes = (signature, message, publicKey) => {
   let signatureBytes = signature
   let messageBytes = message
   let publicKeyBytes = publicKey
@@ -52,8 +52,8 @@ export const verifyBytes = (signature, message, publicKey) => {
   return areByteArraysEqual(h, hexStringToByteArray(h2))
 }
 
-export const parseToken = (tokenString, website) => {
-  let websiteBytes = stringToByteArray(website)
+export const parseToken = (tokenString, dataString) => {
+  let dataBytes = stringToByteArray(dataString)
   let tokenBytes = []
   let i = 0
   let j = 0
@@ -77,7 +77,7 @@ export const parseToken = (tokenString, website) => {
 
   let timestamp = byteArrayToIntVal(timebytes)
   let signature = tokenBytes.slice(36, 100)
-  let data = websiteBytes.concat(tokenBytes.slice(0, 36))
+  let data = dataBytes.concat(tokenBytes.slice(0, 36))
 
   let isValid = verifyBytes(signature, data, publicKey)
   publicKey = byteArrayToHexString(publicKey)
@@ -189,7 +189,6 @@ export const sha256 = (string) => {
 }
 
 export default {
-  verifyBytes,
   parseToken,
   getPublicKey,
   getAccountId,
