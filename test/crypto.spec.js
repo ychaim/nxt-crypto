@@ -47,6 +47,24 @@ describe('nxtCrypto', () => {
     })
   })
 
+  describe('#getAccountRSFromSecretPhrase', () => {
+    const { getAccountRSFromSecretPhrase } = nxtCrypto
+    const secretPhrase = 'test'
+
+
+    it('should be a function', () => {
+      expect(getAccountRSFromSecretPhrase).to.be.a('function')
+    })
+
+    it('should return the correct account reed solomon', () => {
+      expect(getAccountRSFromSecretPhrase(secretPhrase)).to.equal('NXT-E8JD-FHKJ-CQ9H-5KGMQ')
+    })
+
+    it('should return the correct account reed solomon with a different prefix', () => {
+      expect(getAccountRSFromSecretPhrase(secretPhrase, 'DBN')).to.equal('DBN-E8JD-FHKJ-CQ9H-5KGMQ')
+    })
+  })
+
   describe('#generateSecretPhrase()', () => {
     const { generateSecretPhrase } = nxtCrypto
     const secretPhrase = generateSecretPhrase()

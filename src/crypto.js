@@ -96,6 +96,12 @@ export const getPublicKey = (secretPhrase) => {
   return byteArrayToHexString(curve25519.keygen(hashBytes).p);
 }
 
+export function getAccountRSFromSecretPhrase(secretphrase, prefix = 'NXT') {
+  const publicKey = getPublicKey(secretphrase);
+
+  return getAccountRS(publicKey, prefix);
+}
+
 export const getAccountId = (publicKey) => {
   const publicKeyBytes = hexStringToByteArray(publicKey)
   const hashBytes = byteArrayToHashByteArray(publicKeyBytes)
@@ -108,7 +114,7 @@ export const getAccountId = (publicKey) => {
 
 export const getAccountRS = (publicKey, prefix = 'NXT') => {
   const accountId = getAccountId(publicKey)
-  const accountRS = new nxtAddress()
+  const accountRS = new nxtAddress(prefix)
   accountRS.set(accountId)
   return accountRS.toString()
 }
@@ -188,6 +194,7 @@ export default {
   getPublicKey,
   getAccountId,
   getAccountRS,
+  getAccountRSFromSecretPhrase,
   generateSecretPhrase,
   encrypt,
   decrypt,
