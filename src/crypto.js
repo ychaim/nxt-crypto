@@ -15,11 +15,15 @@ import {
 import curve25519 from './curve25519'
 import nxtAddress from './nxtAddress'
 
-export const byteArrayToHashByteArray = (byteArray) => {
+export const byteArrayToHashByteArray = (byteArray, byteArray2) => {
   const hashBytes = crypto.createHash('sha256')
     .update(new Buffer(byteArray))
-    .digest('hex')
-  return hexStringToByteArray(hashBytes)
+
+  if (byteArray2) {
+    hashBytes.update(new Buffer(byteArray2))
+  }
+
+  return hexStringToByteArray(hashBytes.digest('hex'))
 }
 
 export const areByteArraysEqual = (bytes1, bytes2) => {
@@ -188,6 +192,27 @@ export const sha256 = (string) => {
   return crypto.createHash('sha256').update(string).digest('hex')
 }
 
+/**
+ * Sign transaction bytes
+ * @param  {string} message
+ * @param  {string} secretphrase
+ * @return {string} signed transaction bytes
+ */
+export function signBytes(message, secretphrase) {
+  secretphrase = stringToHexString(secretphrase)
+  const messageBytes = hexStringToByteArray(message)
+  const secretphraseBytes = hexStringToByteArray(secretphrase)
+
+  const digest = byteArrayToHashByteArray(secretphraseBytes)
+  const s = curve25519.keygen(digest).s
+  const m = byteArrayToHashByteArray(messageBytes)
+  const x = byteArrayToHashByteArray(m, s)
+  const y = curve25519.keygen(x).p
+  const h = byteArrayToHashByteArray(m, y)
+  const v = curve25519.sign(h, x, s)
+  return byteArrayToHexString(v.concat(h))
+}
+
 export default {
   parseToken,
   getPublicKey,
@@ -197,5 +222,6 @@ export default {
   generateSecretPhrase,
   encrypt,
   decrypt,
-  sha256
+  sha256,
+  signBytes
 }
