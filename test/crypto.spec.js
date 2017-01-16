@@ -97,4 +97,16 @@ describe('nxtCrypto', () => {
       expect(sha256('test')).to.equal('9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
     })
   })
+
+  describe('#signBytes', () => {
+    const { signBytes } = nxtCrypto
+
+    it('should be a function', () => {
+      expect(signBytes).to.be.a('function')
+    })
+
+    it('should generate a correct hash', () => {
+      expect(signBytes('test', 'test')).to.equal('e9b89972141d864bf4ee5290d36a60b5aada835f4185078307456159a045ae020ff5c10ae48fc22a7311a44cc3b8c1d9fcaa5a123d06c3290cb6e48cf21ea990')
+    })
+  })
 })
