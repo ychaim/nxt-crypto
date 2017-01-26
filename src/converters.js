@@ -17,7 +17,7 @@ for (i = 10; i <= 15; ++i) {
   nibbleToChar.push(lowerChar)
 }
 
-const byteArrayToIntVal = (byteArray) => {
+export const byteArrayToIntVal = (byteArray) => {
   let intval = 0
 
   for (let index = 0; index < byteArray.length; index++) {

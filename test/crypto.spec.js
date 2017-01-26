@@ -6,6 +6,20 @@ describe('nxtCrypto', () => {
     expect(nxtCrypto).to.be.a('object')
   })
 
+  describe('#parseToken', () => {
+    const { parseToken } = nxtCrypto
+
+    const token = 'ttbe6vkvclvn7j59mj8612ihdcqfs6cno8id2ei7ithtl2pduuunorc0t8il8oo5v31kl4a4ltm5jdvh056ta0c39njfdi04q3fknf621970bvs8090b8c6q47cij67o84r6p6mftjmalmp7rioq86ku86eku8kv'
+
+    it('should be a function', () => {
+      expect(parseToken).to.be.a('function')
+    })
+
+    it('should be a function', () => {
+      expect(parseToken(token, 'admin').isValid).to.equal(true)
+    })
+  })
+
   describe('#getPublicKey()', () => {
     const { getPublicKey } = nxtCrypto
     const secretPhrase = 'test'
