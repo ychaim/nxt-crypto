@@ -97,17 +97,16 @@ export const parseToken = (tokenString, dataString) => {
 export const generateToken = (tokenString, secretPhrase, epochBeginning = 1385294400000) => {
   const hexwebsite = stringToHexString(tokenString)
   const website = hexStringToByteArray(hexwebsite)
-  const publicKey = getPublicKey(secretPhrase)
+  const publicKey = hexStringToByteArray(getPublicKey(secretPhrase))
   const data = website.concat(publicKey)
   const unix = Math.round(+new Date()/1000)
   const timestamp = unix - epochBeginning
   const timestamparray = toByteArray(timestamp)
   const dataWithTimeStamp = byteArrayToHexString(data.concat(timestamparray))
-
   const token = publicKey.concat(timestamparray)
-  const sig = signBytes(dataWithTimeStamp, secretPhrase)
-
-  const tokenWithSignature = token.concat(sig)
+  const signature = signBytes(dataWithTimeStamp, secretPhrase)
+  const signatureBytes = hexStringToByteArray(signature)
+  const tokenWithSignature = token.concat(signatureBytes)
   let buf = ''
 
   for (var ptr = 0; ptr < 100; ptr += 5) {
