@@ -13,4 +13,12 @@ describe('converters', () => {
       expect(byteArrayToIntVal).to.be.a('function')
     })
   })
+
+  describe('#toByteArray', () => {
+    const { toByteArray } = converters
+
+    it('should be a function', () => {
+      expect(toByteArray).to.be.a('function')
+    })
+  })
 })

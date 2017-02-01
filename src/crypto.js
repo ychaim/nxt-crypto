@@ -10,7 +10,8 @@ import {
   byteArrayToBigInteger,
   stringToByteArray,
   hexStringToByteArray,
-  stringToHexString
+  stringToHexString,
+  toByteArray
 } from './converters'
 import curve25519 from './curve25519'
 import nxtAddress from './nxtAddress'
@@ -91,6 +92,52 @@ export const parseToken = (tokenString, dataString) => {
     timestamp,
     publicKey
   }
+}
+
+export const generateToken = (tokenString, secretPhrase, epochBeginning = 1385294400000) => {
+  const hexwebsite = stringToHexString(tokenString)
+  const website = hexStringToByteArray(hexwebsite)
+  const publicKey = getPublicKey(secretPhrase)
+  const data = website.concat(publicKey)
+  const unix = Math.round(+new Date()/1000)
+  const timestamp = unix - epochBeginning
+  const timestamparray = toByteArray(timestamp)
+  const dataWithTimeStamp = byteArrayToHexString(data.concat(timestamparray))
+
+  const token = publicKey.concat(timestamparray)
+  const sig = signBytes(dataWithTimeStamp, secretPhrase)
+
+  const tokenWithSignature = token.concat(sig)
+  let buf = ''
+
+  for (var ptr = 0; ptr < 100; ptr += 5) {
+      var nbr = [];
+      nbr[0] = tokenWithSignature[ptr] & 0xFF
+      nbr[1] = tokenWithSignature[ptr+1] & 0xFF
+      nbr[2] = tokenWithSignature[ptr+2] & 0xFF
+      nbr[3] = tokenWithSignature[ptr+3] & 0xFF
+      nbr[4] = tokenWithSignature[ptr+4] & 0xFF
+      var number = byteArrayToBigInteger(nbr)
+
+      if (number < 32) {
+          buf+="0000000"
+      } else if (number < 1024) {
+          buf+="000000"
+      } else if (number < 32768) {
+          buf+="00000"
+      } else if (number < 1048576) {
+          buf+="0000"
+      } else if (number < 33554432) {
+          buf+="000"
+      } else if (number < 1073741824) {
+          buf+="00"
+      } else if (number < 34359738368) {
+          buf+="0"
+      }
+      buf +=number.toString(32)
+  }
+
+  return buf
 }
 
 export const getPublicKey = (secretPhrase) => {
@@ -223,5 +270,6 @@ export default {
   encrypt,
   decrypt,
   sha256,
-  signBytes
+  signBytes,
+  generateToken
 }
