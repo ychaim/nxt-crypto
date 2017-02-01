@@ -83,11 +83,24 @@ export const byteArrayToBigInteger = (byteArray) => {
   return value
 }
 
+export const toByteArray = (long) => {
+  const byteArray = [0, 0, 0, 0];
+
+  for (let index = 0; index < byteArray.length; index++) {
+    var byte = long & 0xff;
+    byteArray[index] = byte;
+    long = (long - byte) / 256 ;
+  }
+
+  return byteArray;
+}
+
 export default {
   byteArrayToIntVal,
   byteArrayToHexString,
   byteArrayToBigInteger,
   stringToByteArray,
   hexStringToByteArray,
-  stringToHexString
+  stringToHexString,
+  toByteArray
 }
