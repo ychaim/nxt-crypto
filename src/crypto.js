@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import BigInteger from 'big-integer'
+import BigIntegerCustom from './BigInteger'
 import nacl from 'tweetnacl'
 import util from 'tweetnacl-util'
 nacl.util = util
@@ -259,6 +260,71 @@ export function signBytes(message, secretphrase) {
   return byteArrayToHexString(v.concat(h))
 }
 
+function int32toBytes (num) {
+  const arr = new ArrayBuffer(4); // an Int32 takes 4 bytes
+  const view = new DataView(arr);
+  view.setUint32(0, num, false); // byteOffset = 0; litteEndian = false
+  return Array.from(view);
+}
+
+function pad (length, val) {
+    var array = [];
+    for (var i = 0; i < length; i++) {
+        array[i] = val;
+    }
+    return array;
+}
+
+function wordBytes(word) {
+	return [(word%256), Math.floor(word/256)];
+}
+
+export function generateTransactionBytes (recipient, amountNQT, feeNQT, secretPhrase, prefix = 'NXT') {
+  const publicKeyBytes = hexStringToByteArray(getPublicKey(secretPhrase))
+  const zeroArray = [0];
+  let txbytes = [];
+  const type = 0;
+  txbytes.push(type);
+  const version = 1;
+  const subtype = 0;
+  txbytes.push((version << 4));
+  let timestamp = Math.floor(Date.now() / 1000) - 1385294400;
+  if (process.env.ENV === 'test') {
+    timestamp = Math.floor(1494481510847 / 1000) - 1385294400;
+  }
+  txbytes = txbytes.concat(toByteArray(timestamp));
+  txbytes.push(160);
+  txbytes.push(5); // deadline
+  txbytes = txbytes.concat(publicKeyBytes);
+
+  let recipientRS = new nxtAddress(prefix);
+  recipientRS.set(recipient);
+  let recipientBytes = new BigIntegerCustom(recipientRS.account_id()).toByteArray().reverse();
+  if (recipientBytes.length == 9) recipientBytes = recipientBytes.slice(0,8);
+  while (recipientBytes.length != 8) recipientBytes = recipientBytes.concat(zeroArray);
+  txbytes = txbytes.concat(recipientBytes);
+  let amount = new BigIntegerCustom(String(amountNQT)).toByteArray().reverse();
+  if (amount.length == 9) amount = amount.slice(0,8);
+  while (amount.length != 8) amount = amount.concat(zeroArray);
+  txbytes = txbytes.concat(amount);
+  let feeBytes = new BigIntegerCustom(String(feeNQT)).toByteArray().reverse();
+  while(feeBytes.length != 8) feeBytes = feeBytes.concat(zeroArray);
+  txbytes = txbytes.concat(feeBytes);
+  txbytes = txbytes.concat(pad(32, 0)); // ref full hash
+  txbytes = hexStringToByteArray(byteArrayToHexString(txbytes));
+  let signable = txbytes;
+
+  txbytes = txbytes.concat(pad(64, 0)); // signature
+  txbytes = txbytes.concat(pad(16, 0)); // no public key
+  
+  let sig = signBytes(byteArrayToHexString(txbytes), secretPhrase);
+  sig = hexStringToByteArray(sig)
+  signable = signable.concat(sig);
+  signable = signable.concat(pad(16, 0)); // no public key
+
+  return byteArrayToHexString(signable);
+}
+
 export default {
   parseToken,
   getPublicKey,
@@ -270,5 +336,6 @@ export default {
   decrypt,
   sha256,
   signBytes,
-  generateToken
+  generateToken,
+  generateTransactionBytes
 }

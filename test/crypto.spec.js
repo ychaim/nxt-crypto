@@ -135,4 +135,23 @@ describe('nxtCrypto', () => {
       expect(generateToken('test', 'test'))
     })
   })
+
+  describe('#generateTransactionBytes', () => {
+    const { generateTransactionBytes } = nxtCrypto
+
+    const recipient = 'NXT-E8JD-FHKJ-CQ9H-5KGMQ'
+    const secretPhrase = 'onion town town dignity target argue innocent average chat grab grocery safe'
+    const amount = 100000000
+    const fee = 100000000
+
+    const correctBytes = '001026108206a005ce6d4075d768dae6ff1d04b7a226dec5bdca7cced1e24fe065958cb7cc3f5d000b1a06e36bd14d3b00e1f5050000000000e1f5050000000000000000000000000000000000000000000000000000000000000000000000006e3c4a7d90388bd6f9c63b127457fc03ad1bbd7f707ce8d15994005f3b320806b3189bad296b5ad2c98f1883980580e057ff3a5d392d1e5cb3fa084228b7596200000000000000000000000000000000'
+
+    it('should be a function', () => {
+      expect(generateTransactionBytes).to.be.a('function')
+    })
+
+    it('should generate correct bytes', () => {
+      expect(correctBytes).to.equal(generateTransactionBytes(recipient, amount, fee, secretPhrase))
+    })
+  })
 })
