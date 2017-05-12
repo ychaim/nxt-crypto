@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
-    "test": "mocha --watch --compilers js:babel-register"
+    "test": "ENV=test mocha --watch --compilers js:babel-register"
   },
   "author": "Martijn Buurman",
   "license": "MIT",
