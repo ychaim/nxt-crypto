@@ -58,7 +58,7 @@ const verifyBytes = (signature, message, publicKey) => {
   return areByteArraysEqual(h, hexStringToByteArray(h2))
 }
 
-export const parseToken = (tokenString, dataString) => {
+export const parseToken = (tokenString, dataString, epochBeginning = 1385294400) => {
   let dataBytes = stringToByteArray(dataString)
   let tokenBytes = []
   let i = 0
@@ -82,6 +82,7 @@ export const parseToken = (tokenString, dataString) => {
   let timebytes = [tokenBytes[32], tokenBytes[33], tokenBytes[34], tokenBytes[35]]
 
   let timestamp = byteArrayToIntVal(timebytes)
+  timestamp = new Date((timestamp * 1000) + (epochBeginning * 1000))
   let signature = tokenBytes.slice(36, 100)
   let data = dataBytes.concat(tokenBytes.slice(0, 36))
 
@@ -95,7 +96,7 @@ export const parseToken = (tokenString, dataString) => {
   }
 }
 
-export const generateToken = (tokenString, secretPhrase, epochBeginning = 1385294400000) => {
+export const generateToken = (tokenString, secretPhrase, epochBeginning = 1385294400) => {
   const hexwebsite = stringToHexString(tokenString)
   const website = hexStringToByteArray(hexwebsite)
   const publicKey = hexStringToByteArray(getPublicKey(secretPhrase))
